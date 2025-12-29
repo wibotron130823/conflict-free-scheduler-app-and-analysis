@@ -1,0 +1,113 @@
+
+==============================
+        VERSI ITERATIF
+==============================
+function is_time_conflict_free_iterative
+(
+    Mandatory: array[1...maxM] of Activity,
+    nM: integer,
+    current: Activity,
+    startTime: integer,
+    endTime: integer
+) -> boolean
+kamus
+    i: integer
+    mandatoryStart: integer
+    mandatoryEnd: integer
+algoritma
+    i <- 1
+    while i <= nM do
+        mandatoryStart <- Mandatory[i].start.hour * 60 + Mandatory[i].start.minute
+        mandatoryEnd <- Mandatory[i].end.hour * 60 + Mandatory[i].end.minute
+        if curret.day == Mandatory[i].day then
+            if (startTime < mandatoryEnd AND endTime > mandatoryStart) then
+                return false
+            end if
+        end if
+        i <- i + 1
+    end while
+    return true
+end function
+
+function get_conflict_free_activities_iterative 
+(
+    Candidates: array[1...maxC] of Activity,
+    Mandatory: array[1...maxM] of Activity,
+    nC, nM: integer
+) -> array[1...maxC] of Activity
+kamus
+    current: Activity
+    startTime, endTime, nR, i: integer
+    Result: array[1...maxC] of Activity
+algoritma
+    Result <- emptyActivityArray
+    nR <- 0
+    i <- 1
+    while i <= nC do
+        current <- Candidates[i]
+        startTime <- current.start.hour * 60 + current.start.minute
+        endTime <- current.end.hour * 60 + current.end.minute
+        if is_time_conflict_free_iterative(Mandatory, nM, current, startTime, endTime) then
+            nR <- nR + 1
+            Result[nR] <- current
+        endif
+    i <- i + 1
+    end while
+    return Result
+end function
+
+==============================
+        VERSI REKURSIF
+==============================
+function is_time_conflict_free_recursive
+(
+    Mandatory: array[1...maxM] of Activity,
+    nM: integer,
+    current: Activity,
+    startTime: integer,
+    endTime: integer,
+    i: integer
+) -> boolean
+kamus
+    mandatoryStart: integer
+    mandatoryEnd: integer
+algoritma
+    if i > nM then
+        return true
+    end if
+    mandatoryStart <- Mandatory[i].start.hour * 60 + Mandatory[i].start.minute
+    mandatoryEnd <- Mandatory[i].end.hour * 60 + Mandatory[i].end.minute
+    if curret.day == Mandatory[i].day then
+        if (startTime < mandatoryEnd AND endTime > mandatoryStart) then
+                return false
+        end if
+    end if
+    return is_time_conflict_free_recursive(Mandatory, nM, current, startTime, endTime, i + 1)
+end function
+
+function get_conflict_free_activities_recursive 
+(
+    Candidates, Result: array[1...maxC] of Activity,
+    Mandatory: array[1...maxM] of Activity,
+    i, nC, nR, nM: integer
+) -> array[1...nR] of Activity
+kamus
+    current: Activity
+    startTime, endTime: integer
+algoritma
+    if i == 1 then
+        Result <- emptyActivityArray
+    end if
+    if i > nC then
+        return Result
+    end if
+    current <- Candidates[i]
+    startTime <- current.start.hour * 60 + current.start.minute
+    endTime <- current.end.hour * 60 + current.end.minute
+    if is_time_conflict_free_recursive(Mandatory, nM, current, startTime, endTime, 1) then
+            nR <- nR + 1
+            Result[nR] <- current
+    endif
+    return get_conflict_free_activities_recursive(Candidates, Result, Mandatory, i + 1, nC, nR, nM)
+end function
+
